@@ -80,3 +80,10 @@ def register():
     mail.send(msg)
 
     return "Check email to verify account"
+@app.route('/verify/<token>')
+def verify_email(token):
+    email = serializer.loads(token, salt='email-verify', max_age=3600)
+    user = User.query.filter_by(email=email).first()
+    user.is_verified = True
+    db.session.commit()
+    return "Email verified successfully"
