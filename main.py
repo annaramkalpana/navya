@@ -20,3 +20,16 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(200))
     role = db.Column(db.String(20))
     is_verified = db.Column(db.Boolean, default=False)
+from flask_login import current_user
+from flask import abort
+from functools import wraps
+
+def role_required(role):
+    def wrapper(fn):
+        @wraps(fn)
+        def decorated_view(*args, **kwargs):
+            if not current_user.is_authenticated or current_user.role != role:
+                abort(403)
+            return fn(*args, **kwargs)
+        return decorated_view
+    return wrapper
