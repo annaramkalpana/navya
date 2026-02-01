@@ -87,3 +87,17 @@ def verify_email(token):
     user.is_verified = True
     db.session.commit()
     return "Email verified successfully"
+@app.route('/login', methods=['POST'])
+def login():
+    email = request.form['email']
+    password = request.form['password']
+
+    user = User.query.filter_by(email=email).first()
+
+    if user and check_password_hash(user.password, password):
+        if not user.is_verified:
+            return "Verify your email first"
+        login_user(user)
+        return redirect('/dashboard')
+
+    return "Invalid credentials"
