@@ -110,3 +110,22 @@ def dashboard():
 @role_required("admin")
 def admin():
     return "Admin Dashboard"
+@app.route('/reset', methods=['POST'])
+def reset_password():
+    email = request.form['email']
+    token = serializer.dumps(email, salt='reset-password')
+
+    link = url_for('reset_token', token=token, _external=True)
+    msg = Message("Reset Password", recipients=[email])
+    msg.body = link
+    mail.send(msg)
+
+    return "Password reset email sent"
+
+@app.route('/reset/<token>', methods=['POST'])
+def reset_token(token):
+    email = serializer.loads(token, salt='reset-password', max_age=1800)
+    user = User.query.filter_by(email=email).first()
+    user.password = generate_password_hash(request.form['password'])
+    db.session.commit()
+    return "Password updated"
