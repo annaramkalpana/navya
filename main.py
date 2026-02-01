@@ -105,3 +105,8 @@ def login():
 @login_required
 def dashboard():
     return f"Welcome {request.remote_user}"
+@app.route('/admin')
+@login_required
+@role_required("admin")
+def admin():
+    return "Admin Dashboard"
