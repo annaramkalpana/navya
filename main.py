@@ -134,3 +134,6 @@ def reset_token(token):
 def logout():
     logout_user()
     return redirect('/login')
+@app.errorhandler(403)
+def forbidden(e):
+    return "Access denied", 403
