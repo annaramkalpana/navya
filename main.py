@@ -101,3 +101,7 @@ def login():
         return redirect('/dashboard')
 
     return "Invalid credentials"
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    return f"Welcome {request.remote_user}"
