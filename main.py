@@ -129,3 +129,8 @@ def reset_token(token):
     user.password = generate_password_hash(request.form['password'])
     db.session.commit()
     return "Password updated"
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect('/login')
