@@ -57,3 +57,26 @@ serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.form
+    hashed_pw = generate_password_hash(data['password'])
+
+    user = User(
+        name=data['name'],
+        email=data['email'],
+        password=hashed_pw,
+        role=data['role']
+    )
+
+    db.session.add(user)
+    db.session.commit()
+
+    token = serializer.dumps(user.email, salt='email-verify')
+    link = url_for('verify_email', token=token, _external=True)
+
+    msg = Message("Verify Email", recipients=[user.email])
+    msg.body = f"Click to verify: {link}"
+    mail.send(msg)
+
+    return "Check email to verify account"
